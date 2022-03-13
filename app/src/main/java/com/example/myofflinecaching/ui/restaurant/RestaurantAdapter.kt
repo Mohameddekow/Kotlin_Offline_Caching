@@ -7,12 +7,13 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myofflinecaching.data.Restaurant
 import com.example.myofflinecaching.databinding.RowLayoutBinding
+import com.example.myofflinecaching.difUtil.MyDiffUtil
 import com.example.myofflinecaching.ui.loadImageWithGlide
 
 class RestaurantAdapter(
     private val clickListener: ItemClickListener
 ): RecyclerView.Adapter<RestaurantAdapter.RestaurantViewHolder>(){
-    private var restaurantList = emptyList<Restaurant>()
+    private var oldRestaurantList = emptyList<Restaurant>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RestaurantViewHolder {
         val binding: RowLayoutBinding = RowLayoutBinding.inflate(
@@ -24,12 +25,12 @@ class RestaurantAdapter(
     }
 
     override fun onBindViewHolder(holder: RestaurantViewHolder, position: Int) {
-        val currentRestaurantItem = restaurantList[position]
+        val currentRestaurantItem = oldRestaurantList[position]
         holder.onBind(currentRestaurantItem, clickListener)
     }
 
     override fun getItemCount(): Int {
-        return restaurantList.size
+        return oldRestaurantList.size
     }
 
 
@@ -57,10 +58,13 @@ class RestaurantAdapter(
 
     }
 
-    fun setData(items: List<Restaurant> ){
-        restaurantList = items
+    fun setData(newRestaurants: List<Restaurant> ){
+        val diffUtil = MyDiffUtil(oldRestaurantList, newRestaurants)
+        val diffUtilResult = DiffUtil.calculateDiff(diffUtil)
+        oldRestaurantList = newRestaurants
+        diffUtilResult.dispatchUpdatesTo(this)
 //        RestaurantComparator()
-        notifyDataSetChanged()
+
     }
 
     interface ItemClickListener{

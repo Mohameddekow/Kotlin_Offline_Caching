@@ -5,7 +5,7 @@ import retrofit2.http.GET
 
 interface RestaurantApi {
 
-    @GET("restaurant/random_restaurant?size=20")
+    @GET("restaurant/random_restaurant?size=50")
     suspend fun getRestaurants(): List<Restaurant>
 
 }
