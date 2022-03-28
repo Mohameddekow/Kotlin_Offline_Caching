@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
+import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -14,6 +15,7 @@ import com.example.myofflinecaching.data.Restaurant
 import com.example.myofflinecaching.databinding.ActivityMainBinding
 import com.example.myofflinecaching.ui.restaurant.RestaurantAdapter
 import com.example.myofflinecaching.ui.restaurant.RestaurantViewModel
+import com.example.myofflinecaching.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -47,10 +49,14 @@ class MainActivity : AppCompatActivity(), RestaurantAdapter.ItemClickListener {
                 layoutManager = LinearLayoutManager(this@MainActivity)
             }
 
-            viewModel.restaurants.observe(this@MainActivity, Observer { restaurantList ->
-                myAdapter.setData(restaurantList)
-                println(restaurantList.toString())
+            viewModel.restaurant.observe(this@MainActivity, Observer { result ->
+                result.data?.let { myAdapter.setData(it) }
 
+                progressBar.isVisible = result is Resource.Loading && result.data.isNullOrEmpty()
+                errorMessage.isVisible = result is Resource.Error && result.data.isNullOrEmpty()
+                errorMessage.text = result.error?.localizedMessage
+
+                println(result.toString())
             })
         }
 
